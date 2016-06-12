@@ -7,7 +7,12 @@ import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
+
 import com.mopub.mobileads.MoPubView;
+import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener;
+import com.mopub.mobileads.MoPubErrorCode;
+
 import android.view.View;
 import android.widget.Button;
 
@@ -17,13 +22,14 @@ import com.jirbo.adcolony.AdColonyAdAvailabilityListener;
 import com.jirbo.adcolony.AdColonyAdListener;
 import com.jirbo.adcolony.AdColonyVideoAd;
 
-public class MainActivity extends AppCompatActivity implements AdColonyAdAvailabilityListener, AdColonyAdListener {
+public class MainActivity extends AppCompatActivity implements AdColonyAdAvailabilityListener, AdColonyAdListener, InterstitialAdListener {
     final private String APP_ID  = "app17ac68314d3d4ec79a";
     final private String ZONE_ID = "vz4a146b857ab94aa699";
     private AdColonyVideoAd ad;
 
     private WebView mWebView;
     private MoPubView moPubView;
+    MoPubInterstitial mInterstitial;
 
     private Button button;
 
@@ -47,7 +53,12 @@ public class MainActivity extends AppCompatActivity implements AdColonyAdAvailab
 
         initBannerAd();
         initVideoAd();
+
+        mInterstitial = new MoPubInterstitial(this, "6c88e3c8c4da43da9cab76caf5d9e3b5");
+        mInterstitial.setInterstitialAdListener(this);
+        mInterstitial.load();
     }
+
 
     private void initBannerAd() {
         final String adUnitId = "497c211508fb480386cb5e2a500c0f01";
@@ -91,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements AdColonyAdAvailab
 
     @Override
     public void onDestroy() {
+        mInterstitial.destroy();
         super.onDestroy();
         if (moPubView != null) {
             moPubView.destroy();
@@ -152,4 +164,31 @@ public class MainActivity extends AppCompatActivity implements AdColonyAdAvailab
     public void backHome(View view){
         mWebView.loadUrl("http://videos.techbay.club");
     }
+
+
+
+    // InterstitialAdListener methods
+    @Override
+    public void onInterstitialClicked(MoPubInterstitial interstitial) {
+        //logToast(getActivity(), "Interstitial clicked.");
+    }
+
+    @Override
+    public void onInterstitialLoaded(MoPubInterstitial interstitial) {
+        if (interstitial.isReady()) {
+            mInterstitial.show();
+        } else {
+            // Other code
+        }
+    }
+
+    @Override
+    public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {}
+
+    @Override
+    public void onInterstitialShown(MoPubInterstitial interstitial) {}
+
+    @Override
+    public void onInterstitialDismissed(MoPubInterstitial interstitial) {}
+
 }
